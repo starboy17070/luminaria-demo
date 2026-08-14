@@ -1,0 +1,1483 @@
+ <!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luminaria — Next-Gen AI English Learning Platform</title>
+    
+    <!-- External Resources & Libraries -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        :root {
+            --bg-dark: #090d16;
+            --bg-card: rgba(21, 29, 46, 0.75);
+            --bg-card-hover: rgba(30, 42, 66, 0.85);
+            --bg-input: rgba(255, 255, 255, 0.04);
+            
+            --accent-purple: #8b5cf6;
+            --accent-purple-glow: rgba(139, 92, 246, 0.35);
+            --accent-cyan: #06b6d4;
+            --accent-cyan-glow: rgba(6, 182, 212, 0.35);
+            --accent-pink: #ec4899;
+            --accent-green: #10b981;
+            --accent-yellow: #f59e0b;
+            
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-glass: rgba(255, 255, 255, 0.08);
+            --border-glow: rgba(139, 92, 246, 0.25);
+            
+            --sidebar-width: 270px;
+            --radius-lg: 20px;
+            --radius-md: 14px;
+            --radius-sm: 8px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent-purple) transparent;
+        }
+
+        *::-webkit-scrollbar {
+            width: 6px;
+        }
+        *::-webkit-scrollbar-thumb {
+            background: var(--accent-purple);
+            border-radius: 10px;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(139, 92, 246, 0.12) 0%, transparent 45%),
+                radial-gradient(circle at 85% 85%, rgba(6, 182, 212, 0.12) 0%, transparent 45%),
+                radial-gradient(circle at 50% 50%, rgba(236, 72, 153, 0.05) 0%, transparent 60%);
+            background-attachment: fixed;
+        }
+
+        /* Sidebar Navigation */
+        aside {
+            width: var(--sidebar-width);
+            background: rgba(11, 16, 27, 0.92);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid var(--border-glass);
+            display: flex;
+            flex-direction: column;
+            padding: 24px 16px;
+            position: fixed;
+            height: 100vh;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 24px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple), var(--accent-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 32px;
+            padding-left: 10px;
+            letter-spacing: -0.5px;
+        }
+
+        .logo i {
+            color: var(--accent-cyan);
+            -webkit-text-fill-color: initial;
+            font-size: 26px;
+            filter: drop-shadow(0 0 10px var(--accent-cyan));
+        }
+
+        .nav-menu {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            flex: 1;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 13px 16px;
+            border-radius: var(--radius-md);
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 600;
+            font-size: 14px;
+            position: relative;
+        }
+
+        .nav-item:hover {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.04);
+            transform: translateX(4px);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(90deg, rgba(139, 92, 246, 0.22), rgba(6, 182, 212, 0.08));
+            color: #fff;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.15);
+        }
+
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 20%;
+            height: 60%;
+            width: 4px;
+            background: var(--accent-purple);
+            border-radius: 0 4px 4px 0;
+            box-shadow: 0 0 10px var(--accent-purple);
+        }
+
+        .nav-item i {
+            font-size: 18px;
+            width: 22px;
+            text-align: center;
+        }
+
+        .user-profile-badge {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-md);
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: auto;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: white;
+            box-shadow: 0 0 12px var(--accent-purple-glow);
+        }
+
+        /* Main Area */
+        main {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            padding: 28px 40px;
+            max-width: 1440px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+        }
+
+        .header-title-group h2 {
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .header-title-group p {
+            color: var(--text-muted);
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .stat-pill {
+            background: var(--bg-card);
+            border: 1px solid var(--border-glass);
+            padding: 8px 16px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 10px 20px;
+            border-radius: var(--radius-md);
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-purple), #7c3aed);
+            color: white;
+            box-shadow: 0 4px 18px var(--accent-purple-glow);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(139, 92, 246, 0.6);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--accent-cyan), #0284c7);
+            color: white;
+            box-shadow: 0 4px 18px var(--accent-cyan-glow);
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border-glass);
+            color: var(--text-main);
+        }
+
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+            border-radius: var(--radius-sm);
+        }
+
+        /* Cards & Layout */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-glass);
+            backdrop-filter: blur(16px);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+
+        @media (max-width: 1024px) {
+            .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+        }
+
+        .page-section {
+            display: none;
+            animation: fadeIn 0.35s ease forwards;
+        }
+
+        .page-section.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ================= 1. HOME / DASHBOARD ================= */
+        .hero-banner {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.25), rgba(6, 182, 212, 0.15)), var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            padding: 36px;
+            border-radius: 24px;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .hero-banner::after {
+            content: '';
+            position: absolute;
+            right: -50px;
+            top: -50px;
+            width: 250px;
+            height: 250px;
+            background: radial-gradient(circle, var(--accent-purple-glow) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .hero-text h1 {
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            line-height: 1.2;
+        }
+
+        .hero-text p {
+            color: var(--text-muted);
+            font-size: 15px;
+            max-width: 540px;
+            margin-bottom: 22px;
+            line-height: 1.6;
+        }
+
+        .action-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-lg);
+            padding: 22px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .action-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent-purple);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            background: var(--bg-card-hover);
+        }
+
+        .action-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            margin-bottom: 16px;
+        }
+
+        /* ================= 2. CHATGPT-STYLE AI FRIEND ================= */
+        .chatgpt-layout {
+            display: flex;
+            height: calc(100vh - 160px);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-glass);
+            overflow: hidden;
+            background: var(--bg-card);
+        }
+
+        .chat-sidebar {
+            width: 240px;
+            background: rgba(15, 22, 36, 0.8);
+            border-right: 1px solid var(--border-glass);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .chat-history-list {
+            list-style: none;
+            overflow-y: auto;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .chat-history-item {
+            padding: 10px 12px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            color: var(--text-muted);
+            cursor: pointer;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .chat-history-item:hover, .chat-history-item.active {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-main);
+        }
+
+        .chat-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: rgba(10, 14, 23, 0.6);
+        }
+
+        .chat-messages-container {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .chat-bubble {
+            display: flex;
+            gap: 14px;
+            max-width: 85%;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .chat-bubble.user {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        .chat-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .chat-bubble.ai .chat-avatar {
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
+            color: white;
+            box-shadow: 0 0 10px var(--accent-purple-glow);
+        }
+
+        .chat-bubble.user .chat-avatar {
+            background: var(--accent-pink);
+            color: white;
+        }
+
+        .chat-content {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid var(--border-glass);
+            padding: 14px 18px;
+            border-radius: 16px;
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--text-main);
+        }
+
+        .chat-bubble.user .chat-content {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(236, 72, 153, 0.2));
+            border-color: rgba(139, 92, 246, 0.4);
+        }
+
+        .prompt-chips {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            padding: 0 24px 12px 24px;
+        }
+
+        .chip {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-glass);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .chip:hover {
+            border-color: var(--accent-purple);
+            color: var(--text-main);
+            background: rgba(139, 92, 246, 0.15);
+        }
+
+        .chat-input-box {
+            padding: 16px 24px;
+            background: rgba(15, 22, 36, 0.9);
+            border-top: 1px solid var(--border-glass);
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .chat-input-box input {
+            flex: 1;
+            background: var(--bg-input);
+            border: 1px solid var(--border-glass);
+            padding: 14px 18px;
+            border-radius: var(--radius-md);
+            color: white;
+            font-size: 14px;
+            outline: none;
+            transition: border 0.3s;
+        }
+
+        .chat-input-box input:focus {
+            border-color: var(--accent-purple);
+        }
+
+        /* ================= 3. ESSAY WRITER & AI EVALUATOR ================= */
+        .essay-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 1024px) {
+            .essay-grid { grid-template-columns: 1fr; }
+        }
+
+        .essay-editor {
+            width: 100%;
+            height: 380px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-md);
+            padding: 18px;
+            color: white;
+            font-size: 15px;
+            line-height: 1.7;
+            outline: none;
+            resize: none;
+            margin-top: 12px;
+        }
+
+        .essay-editor:focus {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 15px var(--accent-cyan-glow);
+        }
+
+        .band-score-badge {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: conic-gradient(var(--accent-purple) 80%, rgba(255, 255, 255, 0.1) 0);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            margin: 0 auto 16px auto;
+        }
+
+        .band-score-inner {
+            width: 76px;
+            height: 76px;
+            border-radius: 50%;
+            background: var(--bg-dark);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .band-score-number {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--accent-cyan);
+        }
+
+        .score-bar-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .score-bar-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .score-bar-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+        }
+
+        .progress-track {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+            border-radius: 4px;
+            transition: width 0.8s ease;
+        }
+
+        /* ================= 4. FLASHCARDS & GAMES ================= */
+        .flashcard-container {
+            perspective: 1000px;
+            width: 100%;
+            max-width: 480px;
+            height: 280px;
+            margin: 0 auto 20px auto;
+            cursor: pointer;
+        }
+
+        .flashcard {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .flashcard.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-glass);
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95));
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .card-back {
+            transform: rotateY(180deg);
+            border-color: var(--accent-purple);
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(15, 23, 42, 0.95));
+        }
+
+        /* ================= 5. PLACEMENT QUIZ ================= */
+        .quiz-option {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-glass);
+            padding: 14px 18px;
+            border-radius: var(--radius-md);
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .quiz-option:hover {
+            border-color: var(--accent-purple);
+            background: rgba(139, 92, 246, 0.1);
+        }
+
+        .quiz-option.selected {
+            border-color: var(--accent-cyan);
+            background: rgba(6, 182, 212, 0.15);
+        }
+
+        /* Modals */
+        .modal-backdrop {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(5, 8, 15, 0.8);
+            backdrop-filter: blur(10px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-card {
+            background: #111827;
+            border: 1px solid var(--border-glass);
+            width: 90%;
+            max-width: 440px;
+            padding: 32px;
+            border-radius: 24px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6);
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-glass);
+            background: var(--bg-input);
+            color: white;
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar Navigation -->
+    <aside>
+        <div class="logo">
+            <i class="fa-solid fa-lightbulb"></i> Luminaria
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item active" onclick="navigate('home', this)"><i class="fa-solid fa-compass"></i> Dashboard</li>
+            <li class="nav-item" onclick="navigate('ai-friend', this)"><i class="fa-solid fa-robot"></i> AI Friend Chat</li>
+            <li class="nav-item" onclick="navigate('essay-evaluator', this)"><i class="fa-solid fa-pen-nib"></i> Essay Evaluator</li>
+            <li class="nav-item" onclick="navigate('listening-prep', this)"><i class="fa-solid fa-headphones"></i> IELTS Listening</li>
+            <li class="nav-item" onclick="navigate('speaking-prep', this)"><i class="fa-solid fa-microphone"></i> IELTS Speaking</li>
+            <li class="nav-item" onclick="navigate('flashcards', this)"><i class="fa-solid fa-layer-group"></i> Vocabulary & Flashcards</li>
+            <li class="nav-item" onclick="navigate('placement-test', this)"><i class="fa-solid fa-vial"></i> Placement Test</li>
+            <li class="nav-item" onclick="navigate('results', this)"><i class="fa-solid fa-chart-pie"></i> Analytics & XP</li>
+        </ul>
+
+        <div class="user-profile-badge">
+            <div class="avatar" id="sidebarAvatar">A</div>
+            <div style="overflow: hidden;">
+                <h4 style="font-size: 14px; font-weight:700;" id="sidebarUserName">Alex Smith</h4>
+                <p style="font-size: 11px; color: var(--text-muted);" id="sidebarUserTarget">Target: Band 7.5</p>
+            </div>
+            <i class="fa-solid fa-gear" style="margin-left: auto; color: var(--text-muted); cursor: pointer;" onclick="openModal('profileModal')"></i>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main>
+        <header>
+            <div class="header-title-group">
+                <h2 id="pageTitle">Dashboard Overview</h2>
+                <p id="pageSubtitle">Welcome back! Ready to supercharge your English skills today?</p>
+            </div>
+            <div class="header-actions">
+                <div class="stat-pill"><i class="fa-solid fa-fire" style="color: var(--accent-yellow);"></i> <span id="streakCount">7</span> Days</div>
+                <div class="stat-pill"><i class="fa-solid fa-bolt" style="color: var(--accent-cyan);"></i> <span id="totalXp">1,850</span> XP</div>
+                <button class="btn btn-outline btn-sm" onclick="openModal('signInModal')"><i class="fa-solid fa-right-to-bracket"></i> Sign In</button>
+            </div>
+        </header>
+
+        <!-- 1. DASHBOARD HOME SECTION -->
+        <section id="home" class="page-section active">
+            <div class="hero-banner">
+                <div class="hero-text">
+                    <h1>AI-Powered Path to IELTS Success ✨</h1>
+                    <p>Practice writing essays, chat in real-time with your AI Tutor, take simulated listening tests, and level up your fluency with instant band scores.</p>
+                    <div style="display: flex; gap: 12px;">
+                        <button class="btn btn-primary" onclick="navigate('essay-evaluator', document.querySelectorAll('.nav-item')[2])"><i class="fa-solid fa-feather"></i> Write & Evaluate Essay</button>
+                        <button class="btn btn-secondary" onclick="navigate('ai-friend', document.querySelectorAll('.nav-item')[1])"><i class="fa-solid fa-robot"></i> Chat with AI Friend</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid-4">
+                <div class="action-card" onclick="navigate('ai-friend', document.querySelectorAll('.nav-item')[1])">
+                    <div class="action-icon" style="background: rgba(139, 92, 246, 0.2); color: var(--accent-purple);">
+                        <i class="fa-solid fa-comments"></i>
+                    </div>
+                    <h3>ChatGPT AI Tutor</h3>
+                    <p style="font-size: 12px; color: var(--text-muted); margin-top: 6px;">Natural conversational partner for grammar, idioms, and practice.</p>
+                </div>
+                <div class="action-card" onclick="navigate('essay-evaluator', document.querySelectorAll('.nav-item')[2])">
+                    <div class="action-icon" style="background: rgba(6, 182, 212, 0.2); color: var(--accent-cyan);">
+                        <i class="fa-solid fa-file-signature"></i>
+                    </div>
+                    <h3>IELTS Essay Checker</h3>
+                    <p style="font-size: 12px; color: var(--text-muted); margin-top: 6px;">Get detailed score criteria: Lexical Resource, Coherence, & Band.</p>
+                </div>
+                <div class="action-card" onclick="navigate('speaking-prep', document.querySelectorAll('.nav-item')[4])">
+                    <div class="action-icon" style="background: rgba(236, 72, 153, 0.2); color: var(--accent-pink);">
+                        <i class="fa-solid fa-microphone-lines"></i>
+                    </div>
+                    <h3>Speaking Part 2 Sim</h3>
+                    <p style="font-size: 12px; color: var(--text-muted); margin-top: 6px;">1-min prep timer & voice analysis simulator for cue cards.</p>
+                </div>
+                <div class="action-card" onclick="navigate('flashcards', document.querySelectorAll('.nav-item')[5])">
+                    <div class="action-icon" style="background: rgba(245, 158, 11, 0.2); color: var(--accent-yellow);">
+                        <i class="fa-solid fa-cards-blank"></i>
+                    </div>
+                    <h3>Band 8+ Flashcards</h3>
+                    <p style="font-size: 12px; color: var(--text-muted); margin-top: 6px;">Interactive flip cards with pronunciation and context.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. AI FRIEND (CHATGPT-LIKE INTERFACE) -->
+        <section id="ai-friend" class="page-section">
+            <div class="chatgpt-layout">
+                <div class="chat-sidebar">
+                    <button class="btn btn-primary btn-sm" style="width: 100%;" onclick="startNewChat()"><i class="fa-solid fa-plus"></i> New Conversation</button>
+                    <div style="font-size: 11px; font-weight:700; color:var(--text-muted); margin-top: 10px;">RECENT CHATS</div>
+                    <ul class="chat-history-list" id="chatHistoryList">
+                        <li class="chat-history-item active"><i class="fa-regular fa-message"></i> IELTS Speaking Part 3</li>
+                        <li class="chat-history-item"><i class="fa-regular fa-message"></i> Grammar Corrections</li>
+                        <li class="chat-history-item"><i class="fa-regular fa-message"></i> Dynamic Verb Explanation</li>
+                    </ul>
+                </div>
+
+                <div class="chat-main">
+                    <div class="chat-messages-container" id="chatMessages">
+                        <div class="chat-bubble ai">
+                            <div class="chat-avatar"><i class="fa-solid fa-robot"></i></div>
+                            <div class="chat-content">
+                                Hello! I'm your Luminaria AI Friend powered by advanced language models. I can help you practice speaking, correct your writing, explain complex grammar, or prepare for IELTS tasks! What would you like to work on today?
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="prompt-chips">
+                        <div class="chip" onclick="usePrompt('Can you test my vocabulary for IELTS Academic Writing?')">🎯 Test Academic Vocabulary</div>
+                        <div class="chip" onclick="usePrompt('Explain the difference between Present Perfect and Past Simple with examples.')">💡 Explain Present Perfect</div>
+                        <div class="chip" onclick="usePrompt('Let\'s conduct a mock IELTS Speaking Part 2 interview.')">🗣️ IELTS Speaking Mock</div>
+                    </div>
+
+                    <div class="chat-input-box">
+                        <button class="btn btn-outline" onclick="toggleVoiceInput()"><i class="fa-solid fa-microphone" id="micBtnIcon"></i></button>
+                        <input type="text" id="chatInput" placeholder="Message AI Friend (e.g. 'Correct my sentence: I have gone to London last year')..." onkeypress="if(event.key==='Enter') sendChatMessage()">
+                        <button class="btn btn-primary" onclick="sendChatMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. ESSAY WRITER & AI EVALUATOR -->
+        <section id="essay-evaluator" class="page-section">
+            <div class="essay-grid">
+                <!-- Left: Editor -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title"><i class="fa-solid fa-pen-nib" style="color:var(--accent-purple);"></i> IELTS Task 2 Essay Editor</div>
+                        <div style="font-size: 13px; color: var(--text-muted);"><i class="fa-solid fa-clock"></i> <span id="essayTimer">00:00</span></div>
+                    </div>
+
+                    <div style="background: rgba(255,255,255,0.03); border-radius: 12px; padding: 14px; margin-bottom: 10px; font-size: 13px; border-left: 3px solid var(--accent-cyan);">
+                        <strong>Topic Prompt:</strong> <em>"Some people believe that university education should be free for everyone. To what extent do you agree or disagree?"</em>
+                    </div>
+
+                    <textarea class="essay-editor" id="essayText" placeholder="Start typing your essay here... (Minimum 250 words for optimal Task 2 scoring)" oninput="updateEssayStats()"></textarea>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px;">
+                        <span style="font-size: 13px; color: var(--text-muted);" id="wordCountLabel">Word Count: 0 / 250 words</span>
+                        <button class="btn btn-primary" onclick="evaluateEssay()"><i class="fa-solid fa-wand-magic-sparkles"></i> Evaluate with AI</button>
+                    </div>
+                </div>
+
+                <!-- Right: Evaluation Report -->
+                <div class="card" id="essayFeedbackCard">
+                    <div class="card-header">
+                        <div class="card-title"><i class="fa-solid fa-chart-line" style="color:var(--accent-cyan);"></i> AI Feedback & Score Report</div>
+                    </div>
+
+                    <div id="feedbackPlaceholder" style="text-align: center; padding: 60px 20px; color: var(--text-muted);">
+                        <i class="fa-solid fa-file-circle-check" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
+                        <p>Write or paste your essay on the left and click <strong>"Evaluate with AI"</strong> to generate your band score breakdown.</p>
+                    </div>
+
+                    <div id="feedbackResult" style="display: none;">
+                        <div class="band-score-badge">
+                            <div class="band-score-inner">
+                                <span class="band-score-number" id="resBandScore">7.0</span>
+                                <span style="font-size: 9px; color: var(--text-muted);">OVERALL</span>
+                            </div>
+                        </div>
+
+                        <div class="score-bar-group">
+                            <div class="score-bar-item">
+                                <div class="score-bar-header"><span>Task Achievement</span><strong id="scoreTA">7.5</strong></div>
+                                <div class="progress-track"><div class="progress-fill" id="barTA" style="width: 75%;"></div></div>
+                            </div>
+                            <div class="score-bar-item">
+                                <div class="score-bar-header"><span>Coherence & Cohesion</span><strong id="scoreCC">7.0</strong></div>
+                                <div class="progress-track"><div class="progress-fill" id="barCC" style="width: 70%;"></div></div>
+                            </div>
+                            <div class="score-bar-item">
+                                <div class="score-bar-header"><span>Lexical Resource (Vocabulary)</span><strong id="scoreLR">7.0</strong></div>
+                                <div class="progress-track"><div class="progress-fill" id="barLR" style="width: 70%;"></div></div>
+                            </div>
+                            <div class="score-bar-item">
+                                <div class="score-bar-header"><span>Grammatical Range & Accuracy</span><strong id="scoreGRA">6.5</strong></div>
+                                <div class="progress-track"><div class="progress-fill" id="barGRA" style="width: 65%;"></div></div>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 20px; background: rgba(0,0,0,0.2); padding: 14px; border-radius: 12px; font-size: 13px;" id="feedbackComments">
+                            <!-- Injected by JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. LISTENING PREP -->
+        <section id="listening-prep" class="page-section">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title"><i class="fa-solid fa-headphones" style="color:var(--accent-cyan);"></i> IELTS Listening Section 1: Customer Booking Form</div>
+                    <button class="btn btn-secondary btn-sm" onclick="playAudioLesson()"><i class="fa-solid fa-play"></i> Play Audio Stream</button>
+                </div>
+
+                <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 20px;">Listen to the conversation between a receptionist and a caller, then complete the missing details in the form below.</p>
+
+                <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-glass); border-radius: var(--radius-md); padding: 20px;">
+                    <h4 style="color: var(--accent-cyan); margin-bottom: 14px;">Munich Theatre Trip Registration</h4>
+                    
+                    <div class="grid-2" style="gap: 16px;">
+                        <div>
+                            <label style="font-size: 12px; color: var(--text-muted);">1. Customer Full Name:</label>
+                            <input type="text" id="listenQ1" placeholder="Type answer..." style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border-glass); background: var(--bg-input); color: white; margin-top: 4px;">
+                        </div>
+                        <div>
+                            <label style="font-size: 12px; color: var(--text-muted);">2. Preferred Departure Date:</label>
+                            <input type="text" id="listenQ2" placeholder="Type answer..." style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border-glass); background: var(--bg-input); color: white; margin-top: 4px;">
+                        </div>
+                        <div>
+                            <label style="font-size: 12px; color: var(--text-muted);">3. Ticket Category:</label>
+                            <input type="text" id="listenQ3" placeholder="Type answer..." style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border-glass); background: var(--bg-input); color: white; margin-top: 4px;">
+                        </div>
+                        <div>
+                            <label style="font-size: 12px; color: var(--text-muted);">4. Total Contact Number:</label>
+                            <input type="text" id="listenQ4" placeholder="Type answer..." style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border-glass); background: var(--bg-input); color: white; margin-top: 4px;">
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" style="margin-top: 20px;" onclick="checkListeningAnswers()">Submit Answers</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. SPEAKING PREP -->
+        <section id="speaking-prep" class="page-section">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title"><i class="fa-solid fa-microphone-lines" style="color:var(--accent-pink);"></i> IELTS Speaking Part 2 Cue Card Simulator</div>
+                    <button class="btn btn-outline btn-sm" onclick="generateCueCard()"><i class="fa-solid fa-arrows-rotate"></i> New Topic</button>
+                </div>
+
+                <div style="background: linear-gradient(135deg, rgba(236, 72, 153, 0.1), rgba(139, 92, 246, 0.1)); border: 1px solid rgba(236, 72, 153, 0.3); border-radius: var(--radius-md); padding: 24px; margin-bottom: 20px;">
+                    <h3 id="cueCardTitle" style="color: var(--text-main); font-size: 20px; margin-bottom: 12px;">Describe a memorable journey you took by public transport.</h3>
+                    <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 10px;">You should say:</p>
+                    <ul style="padding-left: 20px; color: var(--text-muted); font-size: 14px; line-height: 1.8;" id="cueCardBullets">
+                        <li>Where you went and who you were with</li>
+                        <li>What mode of transport you used</li>
+                        <li>What happened during the journey</li>
+                        <li>And explain why this trip was so memorable to you</li>
+                    </ul>
+                </div>
+
+                <div style="display: flex; gap: 16px; align-items: center; justify-content: center; background: rgba(0,0,0,0.2); padding: 20px; border-radius: var(--radius-md);">
+                    <div style="text-align: center;">
+                        <div style="font-size: 36px; font-weight: 800; color: var(--accent-yellow);" id="speakingTimer">01:00</div>
+                        <div style="font-size: 12px; color: var(--text-muted);">Preparation Time Remaining</div>
+                    </div>
+                    <button class="btn btn-primary" onclick="startSpeakingPrepTimer()"><i class="fa-solid fa-stopwatch"></i> Start Prep Timer</button>
+                    <button class="btn btn-secondary" onclick="simulateSpeakingRecord()"><i class="fa-solid fa-circle-dot"></i> Record Speech (2 min)</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. FLASHCARDS & VOCABULARY -->
+        <section id="flashcards" class="page-section">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title"><i class="fa-solid fa-layer-group" style="color:var(--accent-purple);"></i> Band 8.0 Academic Vocabulary Deck</div>
+                    <span style="font-size: 13px; color: var(--text-muted);" id="flashcardCounter">Card 1 / 5</span>
+                </div>
+
+                <div class="flashcard-container" onclick="flipFlashcard()">
+                    <div class="flashcard" id="flashcardElement">
+                        <div class="card-front">
+                            <span style="font-size: 12px; color: var(--accent-cyan); font-weight:700; text-transform: uppercase;">Word of the deck</span>
+                            <h2 style="font-size: 32px; font-weight: 800; margin: 12px 0;" id="cardWord">UBIQUITOUS</h2>
+                            <p style="font-size: 13px; color: var(--text-muted);">[Adjective] • Click card to reveal definition & example</p>
+                        </div>
+                        <div class="card-back">
+                            <h3 style="color: var(--accent-purple); margin-bottom: 8px;">Definition</h3>
+                            <p style="font-size: 15px; margin-bottom: 12px;" id="cardDef">Present, appearing, or found everywhere.</p>
+                            <em style="font-size: 13px; color: var(--text-muted);" id="cardExample">"Smartphones have become ubiquitous in modern society."</em>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: center; gap: 16px;">
+                    <button class="btn btn-outline" onclick="prevFlashcard()"><i class="fa-solid fa-arrow-left"></i> Previous</button>
+                    <button class="btn btn-secondary" onclick="pronounceCurrentWord()"><i class="fa-solid fa-volume-high"></i> Pronounce</button>
+                    <button class="btn btn-primary" onclick="nextFlashcard()">Next Card <i class="fa-solid fa-arrow-right"></i></button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 7. PLACEMENT TEST -->
+        <section id="placement-test" class="page-section">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title"><i class="fa-solid fa-vial" style="color:var(--accent-yellow);"></i> Luminaria Quick Proficiency Test</div>
+                    <span style="font-size: 13px; color: var(--text-muted);">Question <span id="quizNum">1</span> / 3</span>
+                </div>
+
+                <div id="quizContainer">
+                    <h3 style="font-size: 18px; margin-bottom: 16px;" id="quizQuestion">1. "If I _______ harder when I was at university, I would have passed the bar exam."</h3>
+                    
+                    <div id="quizOptions">
+                        <div class="quiz-option" onclick="selectQuizOption(this, 0)">A. studied</div>
+                        <div class="quiz-option" onclick="selectQuizOption(this, 1)">B. had studied</div>
+                        <div class="quiz-option" onclick="selectQuizOption(this, 2)">C. have studied</div>
+                        <div class="quiz-option" onclick="selectQuizOption(this, 3)">D. would study</div>
+                    </div>
+
+                    <button class="btn btn-primary" style="margin-top: 20px;" onclick="nextQuizQuestion()">Next Question <i class="fa-solid fa-arrow-right"></i></button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 8. RESULTS & ANALYTICS -->
+        <section id="results" class="page-section">
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-title" style="margin-bottom: 16px;"><i class="fa-solid fa-chart-line" style="color:var(--accent-cyan);"></i> Learning Progression</div>
+                    <canvas id="progressCanvas" height="200" style="width: 100%;"></canvas>
+                </div>
+                <div class="card">
+                    <div class="card-title" style="margin-bottom: 16px;"><i class="fa-solid fa-trophy" style="color:var(--accent-yellow);"></i> Achievements & Badges</div>
+                    <div class="grid-2" style="gap: 12px;">
+                        <div style="background: rgba(255,255,255,0.03); padding: 12px; border-radius: 12px; display: flex; align-items: center; gap: 10px;">
+                            <i class="fa-solid fa-fire" style="font-size: 24px; color: var(--accent-yellow);"></i>
+                            <div><strong>7 Day Streak</strong><p style="font-size: 11px; color: var(--text-muted);">Consistent Learner</p></div>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.03); padding: 12px; border-radius: 12px; display: flex; align-items: center; gap: 10px;">
+                            <i class="fa-solid fa-award" style="font-size: 24px; color: var(--accent-purple);"></i>
+                            <div><strong>Essay Master</strong><p style="font-size: 11px; color: var(--text-muted);">Band 7.0+ Evaluated</p></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Modal Modals -->
+    <div class="modal-backdrop" id="signInModal">
+        <div class="modal-card">
+            <h2 style="margin-bottom: 16px;">Sign In to Luminaria</h2>
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" id="loginEmail" placeholder="alex@domain.com">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="loginPass" placeholder="••••••••">
+            </div>
+            <button class="btn btn-primary" style="width: 100%;" onclick="closeModal('signInModal')">Sign In</button>
+            <button class="btn btn-outline" style="width: 100%; margin-top: 8px;" onclick="closeModal('signInModal')">Cancel</button>
+        </div>
+    </div>
+
+    <div class="modal-backdrop" id="profileModal">
+        <div class="modal-card">
+            <h2 style="margin-bottom: 16px;">User Settings</h2>
+            <div class="form-group">
+                <label>Display Name</label>
+                <input type="text" id="profName" value="Alex Smith">
+            </div>
+            <div class="form-group">
+                <label>Target IELTS Band Score</label>
+                <select id="profBand">
+                    <option value="6.5">Band 6.5</option>
+                    <option value="7.0">Band 7.0</option>
+                    <option value="7.5" selected>Band 7.5</option>
+                    <option value="8.0">Band 8.0</option>
+                    <option value="8.5">Band 8.5+</option>
+                </select>
+            </div>
+            <button class="btn btn-primary" style="width: 100%;" onclick="saveProfileSettings()">Save Changes</button>
+        </div>
+    </div>
+
+    <!-- JavaScript Logic Application Engine -->
+    <script>
+        // Navigation Switcher Engine
+        function navigate(sectionId, navElem) {
+            document.querySelectorAll('.page-section').forEach(sec => sec.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+
+            document.getElementById(sectionId).classList.add('active');
+            if (navElem) navElem.classList.add('active');
+
+            const pageTitles = {
+                'home': ['Dashboard Overview', 'Welcome back! Ready to supercharge your English skills today?'],
+                'ai-friend': ['ChatGPT AI Tutor', 'Interact with your real-time conversational language assistant.'],
+                'essay-evaluator': ['Essay Writer & AI Grading', 'Instant IELTS Task 1 & Task 2 scoring breakdown.'],
+                'listening-prep': ['IELTS Listening Prep', 'Practice real test audio transcripts and gap-fill forms.'],
+                'speaking-prep': ['IELTS Speaking Cue Cards', 'Simulate Part 2 cue cards with preparation timers.'],
+                'flashcards': ['Academic Vocabulary', 'Master high-level Band 8.0 words with pronunciation.'],
+                'placement-test': ['Proficiency Assessment', 'Quick 3-step placement diagnostic quiz.'],
+                'results': ['Analytics & XP Progress', 'Track your fluency growth curves and badges.']
+            };
+
+            if (pageTitles[sectionId]) {
+                document.getElementById('pageTitle').innerText = pageTitles[sectionId][0];
+                document.getElementById('pageSubtitle').innerText = pageTitles[sectionId][1];
+            }
+
+            if (sectionId === 'results') drawProgressChart();
+        }
+
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+        // Speech Engine
+        function speak(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utter = new SpeechSynthesisUtterance(text);
+                utter.lang = 'en-US';
+                utter.rate = 0.95;
+                window.speechSynthesis.speak(utter);
+            }
+        }
+
+        // ChatGPT-Style AI Friend Functionality
+        let isTyping = false;
+
+        function sendChatMessage() {
+            const input = document.getElementById('chatInput');
+            const messageText = input.value.trim();
+            if (!messageText || isTyping) return;
+
+            appendChatBubble('user', messageText);
+            input.value = '';
+
+            isTyping = true;
+            setTimeout(() => {
+                const response = generateAIResponse(messageText);
+                appendChatBubbleWithTyping('ai', response);
+            }, 600);
+        }
+
+        function usePrompt(text) {
+            document.getElementById('chatInput').value = text;
+            sendChatMessage();
+        }
+
+        function appendChatBubble(role, text) {
+            const container = document.getElementById('chatMessages');
+            const bubble = document.createElement('div');
+            bubble.className = `chat-bubble ${role}`;
+            bubble.innerHTML = `
+                <div class="chat-avatar"><i class="fa-solid fa-${role === 'ai' ? 'robot' : 'user'}"></i></div>
+                <div class="chat-content">${text}</div>
+            `;
+            container.appendChild(bubble);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function appendChatBubbleWithTyping(role, fullText) {
+            const container = document.getElementById('chatMessages');
+            const bubble = document.createElement('div');
+            bubble.className = `chat-bubble ${role}`;
+            
+            const avatar = document.createElement('div');
+            avatar.className = 'chat-avatar';
+            avatar.innerHTML = `<i class="fa-solid fa-robot"></i>`;
+
+            const content = document.createElement('div');
+            content.className = 'chat-content';
+
+            bubble.appendChild(avatar);
+            bubble.appendChild(content);
+            container.appendChild(bubble);
+
+            let i = 0;
+            const timer = setInterval(() => {
+                content.innerHTML = fullText.substring(0, i) + '<span style="border-right:2px solid var(--accent-cyan); animation:blink 0.7s infinite;">|</span>';
+                i++;
+                container.scrollTop = container.scrollHeight;
+                if (i > fullText.length) {
+                    clearInterval(timer);
+                    content.innerHTML = fullText;
+                    isTyping = false;
+                    speak(fullText.replace(/<[^>]*>?/gm, ''));
+                }
+            }, 18);
+        }
+
+        function generateAIResponse(input) {
+            const lower = input.toLowerCase();
+            if (lower.includes('correct') || lower.includes('sentence')) {
+                return "<strong>Grammar Check:</strong> Your sentence is mostly clear! Here is the refined Band 8+ version:<br><br><em>'I visited London last year.'</em> (Use Past Simple for specific finished time in the past instead of Present Perfect).";
+            } else if (lower.includes('speaking') || lower.includes('part 2')) {
+                return "Great idea! Here is your IELTS Speaking Part 2 question: <strong>'Describe a piece of technology that you use daily.'</strong> Take 1 minute to think, then try recording your answer in the Speaking tab!";
+            } else if (lower.includes('vocabulary') || lower.includes('test')) {
+                return "Here is a high-level academic word for you: <strong>'Mitigate'</strong> (Verb) - to make something less severe or harmful. Example: <em>'Governments must take steps to mitigate climate change.'</em>";
+            } else {
+                return `That's a fantastic point regarding "${input}". To improve your IELTS fluency, try incorporating complex conjunctions like <em>'not only... but also'</em> or conditional clauses. Would you like me to create a practice exercise for this?`;
+            }
+        }
+
+        function toggleVoiceInput() {
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                const recognition = new SpeechRecognition();
+                recognition.lang = 'en-US';
+
+                document.getElementById('micBtnIcon').className = 'fa-solid fa-spinner fa-spin';
+                recognition.start();
+
+                recognition.onresult = function(event) {
+                    const transcript = event.results[0][0].transcript;
+                    document.getElementById('chatInput').value = transcript;
+                    document.getElementById('micBtnIcon').className = 'fa-solid fa-microphone';
+                    sendChatMessage();
+                };
+
+                recognition.onerror = function() {
+                    document.getElementById('micBtnIcon').className = 'fa-solid fa-microphone';
+                };
+            } else {
+                alert("Speech recognition is not supported on this browser.");
+            }
+        }
+
+        function startNewChat() {
+            document.getElementById('chatMessages').innerHTML = `
+                <div class="chat-bubble ai">
+                    <div class="chat-avatar"><i class="fa-solid fa-robot"></i></div>
+                    <div class="chat-content">
+                        New session started! How can I assist your English preparation now?
+                    </div>
+                </div>
+            `;
+        }
+
+        // Essay Evaluator Engine
+        let essayTimeSeconds = 0;
+        setInterval(() => {
+            if (document.getElementById('essay-evaluator').classList.contains('active')) {
+                essayTimeSeconds++;
+                const mins = String(Math.floor(essayTimeSeconds / 60)).padStart(2, '0');
+                const secs = String(essayTimeSeconds % 60).padStart(2, '0');
+                document.getElementById('essayTimer').innerText = `${mins}:${secs}`;
+            }
+        }, 1000);
+
+        function updateEssayStats() {
+            const text = document.getElementById('essayText').value.trim();
+            const words = text ? text.split(/\s+/).length : 0;
+            document.getElementById('wordCountLabel').innerText = `Word Count: ${words} / 250 words`;
+        }
+
+        function evaluateEssay() {
+            const text = document.getElementById('essayText').value.trim();
+            const words = text ? text.split(/\s+/).length : 0;
+
+            if (words < 30) {
+                alert("Please write a longer essay (at least 30 words) to run the AI evaluator.");
+                return;
+            }
+
+            document.getElementById('feedbackPlaceholder').style.display = 'none';
+            document.getElementById('feedbackResult').style.display = 'block';
+
+            // Calculated scores based on word length & density simulation
+            let band = 6.5;
+            if (words > 150) band = 7.0;
+            if (words > 220) band = 7.5;
+
+            document.getElementById('resBandScore').innerText = band.toFixed(1);
+            document.getElementById('scoreTA').innerText = (band + 0.5).toFixed(1);
+            document.getElementById('scoreCC').innerText = band.toFixed(1);
+            document.getElementById('scoreLR').innerText = band.toFixed(1);
+            document.getElementById('scoreGRA').innerText = (band - 0.5).toFixed(1);
+
+            document.getElementById('barTA').style.width = `${((band + 0.5)/9)*100}%`;
+            document.getElementById('barCC').style.width = `${(band/9)*100}%`;
+            document.getElementById('barLR').style.width = `${(band/9)*100}%`;
+            document.getElementById('barGRA').style.width = `${((band - 0.5)/9)*100}%`;
+
+            document.getElementById('feedbackComments').innerHTML = `
+                <strong style="color:var(--accent-cyan);"><i class="fa-solid fa-circle-check"></i> AI Strengths:</strong> Good usage of paragraph structure and linking words.<br><br>
+                <strong style="color:var(--accent-yellow);"><i class="fa-solid fa-triangle-exclamation"></i> Vocabulary Boosters:</strong> Instead of repeating <em>'important'</em>, consider using <em>'crucial'</em>, <em>'paramount'</em>, or <em>'vital'</em>.
+            `;
+
+            if (typeof confetti === 'function') confetti();
+        }
+
+        // Listening Prep Logic
+        function playAudioLesson() {
+            speak("Welcome to IELTS Listening Section 1. Please listen to the customer details: Name: Sarah Jenkins. Departure Date: 14th of October. Ticket type: Premium Balcony. Contact number: 07911 123456.");
+        }
+
+        function checkListeningAnswers() {
+            const q1 = document.getElementById('listenQ1').value.trim().toLowerCase();
+            if (q1.includes('sarah') || q1.includes('jenkins')) {
+                alert("Great job! Answers checked: 100% Correct. +100 XP added!");
+                if (typeof confetti === 'function') confetti();
+            } else {
+                alert("Sample Answers:\n1. Sarah Jenkins\n2. 14th October\n3. Premium Balcony\n4. 07911 123456");
+            }
+        }
+
+        // Speaking Simulator Logic
+        function startSpeakingPrepTimer() {
+            let sec = 60;
+            const timerElem = document.getElementById('speakingTimer');
+            const interval = setInterval(() => {
+                sec--;
+                timerElem.innerText = `00:${String(sec).padStart(2, '0')}`;
+                if (sec <= 0) {
+                    clearInterval(interval);
+                    speak("Time is up! You may now begin speaking for 2 minutes.");
+                }
+            }, 1000);
+        }
+
+        function simulateSpeakingRecord() {
+            speak("Recording started. Talk continuously for 2 minutes about the cue card prompt.");
+            alert("Microphone recording active! AI is listening for fluency, pause frequency, and vocabulary diversity...");
+        }
+
+        function generateCueCard() {
+            const topics = [
+                { title: "Describe a book you read that had a strong impact on you.", bullets: ["What the book was", "When you read it", "What the main plot was", "And explain why it impacted you so deeply"] },
+                { title: "Describe an old person who you respect and admire.", bullets: ["Who this person is", "How you know them", "What qualities they have", "And explain why you admire them"] }
+            ];
+            const rand = topics[Math.floor(Math.random() * topics.length)];
+            document.getElementById('cueCardTitle').innerText = rand.title;
+            document.getElementById('cueCardBullets').innerHTML = rand.bullets.map(b => `<li>${b}</li>`).join('');
+        }
+
+        // Flashcards Deck Logic
+        const flashcardsData = [
+            { word: "UBIQUITOUS", def: "Present, appearing, or found everywhere.", example: "Smartphones have become ubiquitous in modern society." },
+            { word: "PRAGMATIC", def: "Dealing with things sensibly and realistically.", example: "We need a pragmatic solution to urban traffic problems." },
+            { word: "EXACERBATE", def: "To make a problem or bad situation worse.", example: "High inflation will exacerbate economic inequality." }
+        ];
+        let cardIdx = 0;
+
+        function flipFlashcard() {
+            document.getElementById('flashcardElement').classList.toggle('flipped');
+        }
+
+        function nextFlashcard() {
+            cardIdx = (cardIdx + 1) % flashcardsData.length;
+            updateCardDisplay();
+        }
+
+        function prevFlashcard() {
+            cardIdx = (cardIdx - 1 + flashcardsData.length) % flashcardsData.length;
+            updateCardDisplay();
+        }
+
+        function updateCardDisplay() {
+            document.getElementById('flashcardElement').classList.remove('flipped');
+            const data = flashcardsData[cardIdx];
+            document.getElementById('cardWord').innerText = data.word;
+            document.getElementById('cardDef').innerText = data.def;
+            document.getElementById('cardExample').innerText = `"${data.example}"`;
+            document.getElementById('flashcardCounter').innerText = `Card ${cardIdx + 1} / ${flashcardsData.length}`;
+        }
+
+        function pronounceCurrentWord() {
+            speak(flashcardsData[cardIdx].word);
+        }
+
+        // Quiz Logic
+        function selectQuizOption(elem, idx) {
+            document.querySelectorAll('.quiz-option').forEach(o => o.classList.remove('selected'));
+            elem.classList.add('selected');
+        }
+
+        function nextQuizQuestion() {
+            alert("Question submitted! Your estimated level: B2 / Upper-Intermediate. Recommended target: Band 7.5.");
+            navigate('home', document.querySelectorAll('.nav-item')[0]);
+        }
+
+        // Profile Settings
+        function saveProfileSettings() {
+            const name = document.getElementById('profName').value;
+            const band = document.getElementById('profBand').value;
+
+            document.getElementById('sidebarUserName').innerText = name;
+            document.getElementById('sidebarUserTarget').innerText = `Target: Band ${band}`;
+            document.getElementById('sidebarAvatar').innerText = name.charAt(0).toUpperCase();
+
+            closeModal('profileModal');
+        }
+
+        // Analytics Progress Canvas
+        function drawProgressChart() {
+            const canvas = document.getElementById('progressCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.parentElement.clientWidth - 40;
+            canvas.height = 180;
+
+            const w = canvas.width;
+            const h = canvas.height;
+
+            ctx.clearRect(0, 0, w, h);
+
+            // Draw line
+            ctx.beginPath();
+            ctx.moveTo(20, h - 30);
+            ctx.quadraticCurveTo(w * 0.3, h - 50, w * 0.6, h - 110);
+            ctx.quadraticCurveTo(w * 0.8, h - 130, w - 20, h - 150);
+
+            const grad = ctx.createLinearGradient(0, 0, w, 0);
+            grad.addColorStop(0, '#06b6d4');
+            grad.addColorStop(0.5, '#8b5cf6');
+            grad.addColorStop(1, '#ec4899');
+
+            ctx.strokeStyle = grad;
+            ctx.lineWidth = 4;
+            ctx.stroke();
+        }
+    </script>
+</body>
+</html>
